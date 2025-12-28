@@ -172,3 +172,47 @@ Após a conexão, o fluxo de uso segue as etapas:
   - **Enviar Mensagem:** Abre o chat para troca de textos. O servidor ecoa a mensagem com identificação de IP de origem.
   - **Enviar Arquivo:** Permite selecionar arquivos locais para upload. O arquivo é salvo no servidor com um prefixo único de ID do usuário para evitar sobrescrita.
   - **Meus Arquivos:** Lista os arquivos enviados pelo usuário logado e permite o download (retorno) para a máquina cliente.
+
+---
+
+## 7. Questões Teóricas
+
+**1. Camadas do Modelo OSI/TCP-IP:**
+
+**Qual a função das camadas de Aplicação, Transporte, Rede e Enlace no projeto? Como elas estão representadas na implementação?**
+
+No projeto, as camadas do modelo OSI/TCP-IP aparecem de forma integrada. A camada de Aplicação é representada pelo código Python do cliente e do servidor, onde são definidas as mensagens trocadas. A camada de Transporte é implementada pelo uso do protocolo TCP, que garante comunicação confiável, ordenada e sem perdas. A camada de Rede é responsável pelo endereçamento IP (IPv4 e IPv6), permitindo que os pacotes cheguem ao destino correto. Já a camada de Enlace atua na transmissão física dos dados pela rede local, utilizando tecnologias como Ethernet ou Wi-Fi, embora não seja diretamente programada pelo desenvolvedor.
+
+**Qual a diferença entre um protocolo da camada de transporte (ex.: TCP) e um da camada de rede (ex.: IP)?**
+
+O TCP garante a entrega confiável dos dados entre aplicações, enquanto o IP é responsável apenas pelo endereçamento e roteamento dos pacotes na rede.
+
+**2. Protocolos:**
+
+**O que é um protocolo de rede? Dê exemplos usados no projeto (ex.: TCP, IP) e explique suas funções.**
+
+Protocolos de rede são regras e padrões que permitem a comunicação entre dispositivos. No projeto, o IP é usado para identificar os dispositivos na rede, tanto em IPv4 quanto em IPv6. O TCP é responsável por estabelecer a conexão entre cliente e servidor, garantindo que os dados sejam entregues corretamente, na ordem correta e sem perdas.
+
+**Qual a diferença entre TCP e UDP? Por que usamos TCP neste projeto?**
+
+O TCP é confiável e orientado a conexão, enquanto o UDP é mais rápido, porém não garante entrega. O TCP foi usado para garantir que as mensagens chegassem corretamente.
+
+**3. IPv4 vs. IPv6:**
+
+**Quais as principais diferenças entre IPv4 e IPv6? Por que o IPv6 é necessário?**
+
+O IPv4 utiliza endereços de 32 bits, o que limita o número de endereços disponíveis enquanto o IPv6 utiliza 128 bits, permitindo uma quantidade praticamente ilimitada de endereços. O IPv6 também melhora a segurança, o roteamento e suporta autoconfiguração automática. Ele é necessário porque os endereços IPv4 estão praticamente esgotados.
+
+**Como você configurou os endereços IPv4 e IPv6? Quais desafios encontrou?**
+
+Para o IPv4, foi feita a configuração manual do endereço IP, máscara de sub-rede e gateway. No IPv6, foi utilizado o mecanismo de SLAAC, permitindo que o dispositivo obtivesse automaticamente seu endereço a partir do roteador. O principal desafio foi compreender o formato dos endereços IPv6 e lidar com endereços link-local durante os testes.
+
+**4. Programação com Sockets:**
+
+**Explique o conceito de sockets e seu uso na comunicação em rede.**
+
+Sockets são pontos finais de comunicação usados por aplicações para enviar e receber dados pela rede. No projeto, os sockets permitem que o cliente se conecte ao servidor usando TCP, estabelecendo uma comunicação baseada em IP e porta, possibilitando a troca de mensagens entre os dois processos.
+
+**O que significa uma conexão “orientada a conexão” no contexto do TCP?**
+
+Significa que uma conexão é estabelecida antes da troca de dados, garantindo confiabilidade.
