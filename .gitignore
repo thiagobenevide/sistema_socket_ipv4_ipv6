@@ -1,2 +1,4 @@
 __pycache__/
 venv_terceira_va/
+build/
+cliente.spec
