@@ -161,6 +161,101 @@ Utilizada quando não há servidor DHCPv6, fazendo uso dos endereços autoconfig
   - **Exemplo:** `fe80::20c:29ff:fe45:6789%wlo1`
 4. Clique em **Conectar**.
 
+### 5.1: Configuração de Rede Dual-Stack (IPv4 e IPv6) em KVM (OPCIONAL)
+
+### Passo 1: Habilitar o IPv6 no Host (Computador Principal)
+
+Por padrão, o KVM cria apenas uma rede IPv4. Precisamos adicionar o suporte ao IPv6 no "roteador virtual" do seu Fedora.
+
+1. Abra o terminal no seu **Fedora** e edite a rede padrão:
+
+```bash
+sudo virsh net-edit default
+```
+
+1. O arquivo de configuração vai abrir. Procure o bloco que tem o IPv4 (`192.168...`) e adicione a linha do IPv6 logo abaixo dele, conforme o modelo:
+
+```xml
+<network>
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.122.2' end='192.168.122.254'/>
+    </dhcp>
+  </ip>
+
+  <ip family='ipv6' address='fd00::1' prefix='64'/>
+
+</network>
+
+```
+
+Salve e feche o editor (`Esc`, depois digite `:wq` e `Enter`).
+
+### Passo 2: Aplicar as Alterações
+
+Para que o novo endereço funcione, é obrigatório reiniciar a rede virtual e as máquinas.
+
+Execute no terminal do **Fedora**:
+
+```bash
+# 1. Desliga a rede antiga
+sudo virsh net-destroy default
+
+# 2. Liga a rede atualizada (com IPv6)
+sudo virsh net-start default
+
+# 3. Reinicia a VM para ela pegar o novo IP
+sudo virsh reboot nome-da-sua-vm
+```
+
+*(Repita o passo 3 para cada VM que você tiver).*
+
+---
+
+### Passo 3: Liberar a Porta na VM (Recebimento)
+
+Para que a VM aceite conexões externas, precisamos abrir a porta no Firewall do sistema convidado (Xubuntu).
+
+1. Acesse o terminal **dentro da VM Xubuntu**.
+2. Libere a porta 5000 (usada no seu projeto):
+
+```bash
+sudo ufw allow 5000/tcp
+```
+
+*(Se o firewall estiver desligado/inativo, a porta já estará aberta, mas é boa prática deixar a regra criada).*
+
+### Passo 4: Identificar os Endereços IPs Corretos
+
+Agora vamos descobrir quais "números" usar para conectar.
+
+1. No terminal da **VM Xubuntu**, rode:
+
+```bash
+ip -6 a
+```
+
+**Como saber qual é o IP certo?** O comando vai mostrar vários endereços. Use esta regra para filtrar:
+
+- 🔴 **NÃO USE:** Endereços que começam com `fe80:`. (São apenas para uso interno do sistema).
+- 🔴 **NÃO COPIE:** O final que tem `%enp1s0` ou `%eth0`.
+- 🟢 **USE ESTE:** O endereço que começa com `fd00:`. Este é o seu IP Global acessível.
+
+### Passo 5: Como Conectar (Sintaxe Correta)
+
+Ao colocar o endereço no seu software cliente ou navegador, a forma de escrever muda:
+
+**A. Para Conexão via IPv4:**
+
+- Simples e direto.
+- **Exemplo:** `192.168.122.50`
+
+**B. Para Conexão via IPv6 (Atenção aqui!):**
+
+- **No seu Software Python (Socket):** Use o IP "limpo", apenas os números e letras hexadecimais.
+  - ✅ Exemplo: `fd00::5054:ff:feb0:ddb9`
+  - ❌ Errado: `fd00::5054:ff:feb0:ddb9%enp1s0` (Nunca use o final com %)
+
 ---
 
 ## 6. Funcionalidades do Sistema
